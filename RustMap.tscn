@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dk6botej7maj5"]
+
+[ext_resource type="Texture2D" uid="uid://d32yn2yydrlpy" path="res://images/RustStage.png" id="1_6eo5e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x1kum"]
+size = Vector2(1202, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rnkuw"]
+size = Vector2(1132.5, 51)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6eo5e"]
+size = Vector2(256.78125, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aees8"]
+size = Vector2(256.78125, 24)
+
+[node name="Map" type="Node2D" unique_id=2013299384]
+
+[node name="Stage" type="Area2D" parent="." unique_id=2090036516]
+
+[node name="Sprite2D" type="Sprite2D" parent="Stage" unique_id=762934871]
+position = Vector2(976.00006, 888)
+scale = Vector2(1.1286601, 1)
+texture = ExtResource("1_6eo5e")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Stage" unique_id=1921470845]
+position = Vector2(968, 864)
+shape = SubResource("RectangleShape2D_x1kum")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Stage" unique_id=319654546]
+position = Vector2(961.75, 918.5)
+shape = SubResource("RectangleShape2D_rnkuw")
+
+[node name="Platform" type="Area2D" parent="." unique_id=55628924]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform" unique_id=1358470128]
+position = Vector2(576, 656)
+shape = SubResource("RectangleShape2D_6eo5e")
+
+[node name="Platform2" type="Area2D" parent="." unique_id=1646349752]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform2" unique_id=1415090319]
+position = Vector2(1344, 656)
+shape = SubResource("RectangleShape2D_aees8")

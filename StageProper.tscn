@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bm64najw6vh12"]
+
+[ext_resource type="PackedScene" uid="uid://dxvagwre2f6pn" path="res://3dModels/ProtoStageSSBM.glb" id="1_6ldny"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_e0lor"]
+size = Vector3(2.07, 3.26, 2.02)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8qxny"]
+size = Vector3(2.3, 3.07, 0.06)
+
+[node name="ProtoStageSSBM" unique_id=232341958 instance=ExtResource("1_6ldny")]
+
+[node name="CollisionShape3D" parent="Cube/StaticBody3D" parent_id_path=PackedInt32Array(912855658) index="0" unique_id=1545086486]
+shape = SubResource("BoxShape3D_e0lor")
+debug_color = Color(0.9734263, 0, 0.43744412, 0.41960785)
+
+[node name="LeftLedge" type="CollisionShape3D" parent="Cube/StaticBody3D" parent_id_path=PackedInt32Array(912855658) index="1" unique_id=1862317836]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.01)
+shape = SubResource("BoxShape3D_8qxny")
+debug_color = Color(0.079514705, 0.6494912, 5.7756904e-07, 0.41960785)
+
+[node name="RightLedge" type="CollisionShape3D" parent="Cube/StaticBody3D" parent_id_path=PackedInt32Array(912855658) index="2" unique_id=1050073173]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.01)
+shape = SubResource("BoxShape3D_8qxny")
+debug_color = Color(0.079514705, 0.6494912, 5.7756904e-07, 0.41960785)
