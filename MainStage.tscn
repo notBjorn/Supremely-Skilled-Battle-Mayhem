@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://ckpotuqgtjtfq"]
+
+[ext_resource type="PackedScene" uid="uid://bm64najw6vh12" path="res://StageProper.tscn" id="1_a202f"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_noarx"]
+size = Vector3(10, 4, 45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a0tk4"]
+size = Vector3(10, 22, 4)
+
+[node name="Main Stage" type="Node3D" unique_id=1020640790]
+
+[node name="ProtoStageSSBM" parent="." unique_id=232341958 instance=ExtResource("1_a202f")]
+
+[node name="DeathBox" type="Area3D" parent="." unique_id=1466533038]
+transform = Transform3D(1.14, 0, 0, 0, 1.14, 0, 0, 0, 1.14, 0, 0, 0)
+
+[node name="Bottom" type="CollisionShape3D" parent="DeathBox" unique_id=1030946630]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
+shape = SubResource("BoxShape3D_noarx")
+
+[node name="Top" type="CollisionShape3D" parent="DeathBox" unique_id=507031734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+shape = SubResource("BoxShape3D_noarx")
+
+[node name="Left" type="CollisionShape3D" parent="DeathBox" unique_id=1579785661]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 19)
+shape = SubResource("BoxShape3D_a0tk4")
+
+[node name="Left2" type="CollisionShape3D" parent="DeathBox" unique_id=204363415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -19)
+shape = SubResource("BoxShape3D_a0tk4")
