@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://cmegm3qup17ys"]
 
+[ext_resource type="Script" uid="uid://crirs0tb8ahm1" path="res://scripts/fighter_controller.gd" id="1_iwpo4"]
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_bu0v1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_iwpo4"]
@@ -7,6 +9,7 @@ radius = 0.51
 height = 2.025
 
 [node name="CharacterBody3D" type="CharacterBody3D" unique_id=955434138]
+script = ExtResource("1_iwpo4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=522193610]
 mesh = SubResource("CapsuleMesh_bu0v1")
