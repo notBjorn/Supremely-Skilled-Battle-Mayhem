@@ -39,6 +39,11 @@ const STATE_COLORS := {
 @export var bounds_z := 19.0
 @export var lower_death_y := -12.0
 @export var upper_death_y := 12.0
+@export var max_jumps := 2
+@export var double_jump_velocity_scale := 0.95
+@export var drop_through_duration := 0.3
+@export var ground_layer_bit := 1
+@export var platform_layer_bit := 2
 
 @export var attack_damage := 7.0
 @export var attack_duration := 0.36
@@ -66,6 +71,8 @@ var previous_action_states := {}
 var input_event_count := 0
 var last_input_action := ""
 var last_started_action := ""
+var jumps_used := 0
+var drop_through_remaining := 0.0
 
 var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
@@ -80,12 +87,16 @@ func _ready() -> void:
 	if mesh_instance:
 		mesh_instance.material_override = state_material
 	_ensure_hitbox()
+	collision_mask = ground_layer_bit | platform_layer_bit
 	_set_state(STATE_IDLE)
 	add_to_group("fighters")
 
 func _physics_process(delta: float) -> void:
 	if _is_out_of_bounds():
 		_respawn()
+	_check_drop_through_input()
+	_tick_drop_through(delta)
+	_update_collision_mask()
 	_tick_action_locks(delta)
 	if action_lock_remaining > 0.0:
 		_queue_action_during_lock()
@@ -158,7 +169,7 @@ func _ensure_hitbox() -> void:
 		hitbox_shape.name = "HitboxShape"
 		hitbox.add_child(hitbox_shape)
 	var box := BoxShape3D.new()
-	box.size = Vector3(1.3, 1.45, 1.05)
+	box.size = Vector3(0.65, 0.725, 0.525)
 	hitbox_shape.shape = box
 	hitbox_shape.disabled = true
 
@@ -200,8 +211,7 @@ func _start_action(action: String) -> void:
 		ACTION_SPECIAL:
 			_start_attack(special_damage, special_duration, special_active_time, special_base_knockback, special_knockback_scale)
 		ACTION_JUMP:
-			if is_on_floor():
-				velocity.y = jump_velocity
+			_try_jump()
 			_set_state(STATE_JUMP)
 		ACTION_SHIELD:
 			if is_on_floor():
@@ -260,8 +270,30 @@ func _apply_movement(delta: float) -> void:
 func _apply_gravity(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y = maxf(velocity.y - gravity * delta, -fall_speed_limit)
-	elif velocity.y < 0.0:
-		velocity.y = 0.0
+	else:
+		if velocity.y < 0.0:
+			velocity.y = 0.0
+		jumps_used = 0
+
+func _try_jump() -> bool:
+	if jumps_used >= max_jumps:
+		return false
+	var scale_factor := 1.0 if jumps_used == 0 else double_jump_velocity_scale
+	velocity.y = jump_velocity * scale_factor
+	jumps_used += 1
+	return true
+
+func _check_drop_through_input() -> void:
+	if _pressed_once(down_action) and is_on_floor():
+		drop_through_remaining = drop_through_duration
+
+func _tick_drop_through(delta: float) -> void:
+	if drop_through_remaining > 0.0:
+		drop_through_remaining = maxf(drop_through_remaining - delta, 0.0)
+
+func _update_collision_mask() -> void:
+	var pass_through := drop_through_remaining > 0.0 or velocity.y > 0.01
+	collision_mask = ground_layer_bit if pass_through else (ground_layer_bit | platform_layer_bit)
 
 func _update_passive_state() -> void:
 	if action_lock_remaining > 0.0:
@@ -276,7 +308,7 @@ func _update_passive_state() -> void:
 func _position_hitbox() -> void:
 	if hitbox == null:
 		return
-	hitbox.position = Vector3(0.0, 0.2, facing_z * 0.95)
+	hitbox.position = Vector3(0.0, 0.1, facing_z * 0.475)
 
 func _set_hitbox_enabled(enabled: bool) -> void:
 	if hitbox == null or hitbox_shape == null:
@@ -314,5 +346,7 @@ func _respawn() -> void:
 	damage_percent = 0.0
 	action_lock_remaining = 0.0
 	queued_action = ""
+	jumps_used = 0
+	drop_through_remaining = 0.0
 	_disable_hitbox()
 	_set_state(STATE_IDLE)

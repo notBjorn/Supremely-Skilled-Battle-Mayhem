@@ -9,6 +9,15 @@ size = Vector3(10, 4, 45)
 [sub_resource type="BoxShape3D" id="BoxShape3D_a0tk4"]
 size = Vector3(10, 22, 4)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_plat"]
+size = Vector3(1.5, 0.15, 2.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plat"]
+size = Vector3(1.5, 0.15, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="StdMat_plat"]
+albedo_color = Color(0.45, 0.7, 0.95, 1)
+
 [node name="Main Stage" type="Node3D" unique_id=1020640790]
 
 [node name="ProtoStageSSBM" parent="." unique_id=232341958 instance=ExtResource("1_a202f")]
@@ -56,6 +65,18 @@ special_action = "p2_special"
 shield_action = "p2_shield"
 dodge_action = "p2_dodge"
 spawn_position = Vector3(0, 3, -2.5)
+
+[node name="Platform" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+collision_layer = 2
+collision_mask = 0
+
+[node name="PlatformShape" type="CollisionShape3D" parent="Platform"]
+shape = SubResource("BoxShape3D_plat")
+
+[node name="PlatformMesh" type="MeshInstance3D" parent="Platform"]
+mesh = SubResource("BoxMesh_plat")
+material_override = SubResource("StdMat_plat")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1147411128]
 transform = Transform3D(-4.371139e-08, -0.309017, 0.95105654, 0, 0.95105654, 0.309017, -1, 1.3507562e-08, -4.1572e-08, 11, 5, 0)
