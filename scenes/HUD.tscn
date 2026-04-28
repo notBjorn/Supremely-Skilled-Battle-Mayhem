@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.0, 0.0, 0.0, 0.65)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="P1Panel" type="PanelContainer" parent="Control"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -130.0
+offset_right = 260.0
+offset_bottom = -20.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Control/P1Panel"]
+theme_override_constants/separation = 6
+
+[node name="PlayerLabel" type="Label" parent="Control/P1Panel/VBox"]
+text = "P1"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.4, 0.75, 1.0, 1)
+
+[node name="PercentLabel" type="Label" parent="Control/P1Panel/VBox"]
+text = "0%"
+theme_override_font_sizes/font_size = 42
+
+[node name="Stocks" type="HBoxContainer" parent="Control/P1Panel/VBox"]
+theme_override_constants/separation = 6
+
+[node name="Stock1" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(0.3, 0.65, 1.0, 1)
+
+[node name="Stock2" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(0.3, 0.65, 1.0, 1)
+
+[node name="Stock3" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(0.3, 0.65, 1.0, 1)
+
+[node name="P2Panel" type="PanelContainer" parent="Control"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -130.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Control/P2Panel"]
+theme_override_constants/separation = 6
+
+[node name="PlayerLabel" type="Label" parent="Control/P2Panel/VBox"]
+text = "P2"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1.0, 0.4, 0.4, 1)
+
+[node name="PercentLabel" type="Label" parent="Control/P2Panel/VBox"]
+text = "0%"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 42
+
+[node name="Stocks" type="HBoxContainer" parent="Control/P2Panel/VBox"]
+theme_override_constants/separation = 6
+alignment = 2
+
+[node name="Stock1" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(1.0, 0.35, 0.35, 1)
+
+[node name="Stock2" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(1.0, 0.35, 0.35, 1)
+
+[node name="Stock3" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+custom_minimum_size = Vector2(22, 22)
+color = Color(1.0, 0.35, 0.35, 1)
