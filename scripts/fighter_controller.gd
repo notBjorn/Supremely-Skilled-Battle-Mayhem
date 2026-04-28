@@ -1,5 +1,8 @@
 extends CharacterBody3D
 
+signal damaged(player_idx: int, new_percent: float)
+signal died(player_idx: int)
+
 const STATE_IDLE := "idle"
 const STATE_JUMP := "jump"
 const STATE_ATTACK := "attack"
@@ -125,6 +128,7 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 	action_lock_remaining = damage_stun_duration
 	_disable_hitbox()
 	_set_state(STATE_DAMAGE)
+	damaged.emit(_player_index(), damage_percent)
 
 func _input(event: InputEvent) -> void:
 	input_event_count += 1
@@ -340,7 +344,11 @@ func _set_state(next_state: String) -> void:
 func _is_out_of_bounds() -> bool:
 	return global_position.y < lower_death_y or global_position.y > upper_death_y or absf(global_position.z) > bounds_z
 
+func _player_index() -> int:
+	return 2 if player_label == "P2" else 1
+
 func _respawn() -> void:
+	died.emit(_player_index())
 	global_position = spawn_position
 	velocity = Vector3.ZERO
 	damage_percent = 0.0
