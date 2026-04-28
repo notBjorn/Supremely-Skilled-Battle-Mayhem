@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://rhmaog3ubix4" path="res://scripts/gameplay_scene.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://ckpotuqgtjtfq" path="res://MainStage.tscn" id="2"]
-[ext_resource type="PackedScene" uid="uid://cmegm3qup17ys" path="res://character_body_3d.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="4"]
 
 [sub_resource type="Environment" id="Env_1"]
@@ -18,21 +17,6 @@ script = ExtResource("1")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1490192126]
 environment = SubResource("Env_1")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1015435327]
-transform = Transform3D(1, 0, 0, 0, 0.707, -0.707, 0, 0.707, 0.707, 0, 10, 0)
-light_energy = 1.2
-shadow_enabled = true
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=969464254]
-transform = Transform3D(7.3611744e-08, -0.3420202, 0.9396926, -8.2150535e-08, 0.9396926, 0.3420202, -1, -1.0237295e-07, 4.1075268e-08, 10, 5, 0)
-fov = 60.0
-
 [node name="MainStage" parent="." unique_id=1433430669 instance=ExtResource("2")]
-
-[node name="Player1" parent="." unique_id=555917281 instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 4)
-
-[node name="Player2" parent="." unique_id=59649896 instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -4)
 
 [node name="HUD" parent="." unique_id=1297227089 instance=ExtResource("4")]
