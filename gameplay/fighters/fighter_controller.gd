@@ -93,6 +93,9 @@ var hitbox: Area3D
 var hitbox_shape: CollisionShape3D
 var pushbox: Area3D
 var pushbox_shape: CollisionShape3D
+var sfx_jump: AudioStreamPlayer
+var sfx_punch: AudioStreamPlayer
+var sfx_shield: AudioStreamPlayer
 
 func _ready() -> void:
 	if spawn_position == Vector3.ZERO:
@@ -104,6 +107,7 @@ func _ready() -> void:
 		mesh_instance.material_override = state_material
 	_ensure_hitbox()
 	_ensure_pushbox()
+	_setup_audio()
 	collision_layer = fighter_layer_bit
 	collision_mask = ground_layer_bit | platform_layer_bit
 	_set_state(STATE_IDLE)
@@ -258,6 +262,8 @@ func _start_attack(damage: float, duration: float, active_time: float, base_knoc
 	_position_hitbox()
 	_set_hitbox_enabled(true)
 	_set_state(STATE_ATTACK)
+	if sfx_punch and not sfx_punch.playing:
+		sfx_punch.play()
 
 # This is the input queue: one action can buffer while the current locked action finishes.
 func _queue_action_during_lock() -> void:
@@ -309,6 +315,8 @@ func _try_jump() -> bool:
 	var scale_factor := 1.0 if jumps_used == 0 else double_jump_velocity_scale
 	velocity.y = jump_velocity * scale_factor
 	jumps_used += 1
+	if sfx_jump:
+		sfx_jump.play()
 	return true
 
 func _check_drop_through_input() -> void:
@@ -382,6 +390,17 @@ func _ensure_pushbox() -> void:
 	box.size = pushbox_size
 	pushbox_shape.shape = box
 
+func _setup_audio() -> void:
+	sfx_jump = AudioStreamPlayer.new()
+	sfx_jump.stream = load("res://gameplay/fighters/sounds/jump_audio.wav")
+	add_child(sfx_jump)
+	sfx_punch = AudioStreamPlayer.new()
+	sfx_punch.stream = load("res://gameplay/fighters/sounds/punch_audio.wav")
+	add_child(sfx_punch)
+	sfx_shield = AudioStreamPlayer.new()
+	sfx_shield.stream = load("res://gameplay/fighters/sounds/shield_audio.wav")
+	add_child(sfx_shield)
+
 # Melee-style soft push: fighters phase through each other, but slow grounded
 # overlaps get a gentle separation nudge. High relative speed = clean pass-through.
 func _apply_pushbox(delta: float) -> void:
@@ -423,11 +442,17 @@ func _on_hitbox_body_entered(body: Node3D) -> void:
 	body.take_damage(current_attack_damage, Vector3(0.0, knockback_strength * 0.45, facing_z * knockback_strength))
 
 func _set_state(next_state: String) -> void:
+	var prev_state := state
 	state = next_state
 	if state_material:
 		var color: Color = STATE_COLORS.get(state, Color.WHITE)
 		color.a = state_material.albedo_color.a
 		state_material.albedo_color = color
+	if sfx_shield:
+		if prev_state != STATE_SHIELD and next_state == STATE_SHIELD:
+			sfx_shield.play()
+		elif prev_state == STATE_SHIELD and next_state != STATE_SHIELD:
+			sfx_shield.stop()
 
 func _is_out_of_bounds() -> bool:
 	return global_position.y < lower_death_y or global_position.y > upper_death_y or absf(global_position.z) > bounds_z

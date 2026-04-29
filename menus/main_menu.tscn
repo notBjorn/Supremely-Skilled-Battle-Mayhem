@@ -1,41 +1,50 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://ctgikclpu56jy"]
 
-[ext_resource type="Script" path="res://menus/main_menu.gd" id="1"]
+[ext_resource type="Script" uid="uid://b0e6kyi5p4nj5" path="res://menus/main_menu.gd" id="1"]
 
-[node name="MainMenu" type="Control"]
-script = ExtResource("1")
+[node name="MainMenu" type="Control" unique_id=1745604898]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=240266111]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.06, 0.06, 0.14, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=391782690]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=370279057]
+layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=601759454]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
 text = "Supremely Skilled
 Battle Mayhem"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 56
 
-[node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=345326457]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "2 Player Local Battle"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
 
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer" unique_id=297312850]
 custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
 
-[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1526103746]
 custom_minimum_size = Vector2(220, 60)
-text = "Play"
+layout_mode = 2
 theme_override_font_sizes/font_size = 28
+text = "Play"
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
