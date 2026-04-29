@@ -11,13 +11,13 @@ config_version=5
 [application]
 
 config/name="Supremely Skilled Battle Mayhem"
-run/main_scene="res://scenes/MainMenu.tscn"
+run/main_scene="res://menus/main_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.png"
 
 [autoload]
 
-GameState="*res://scripts/game_state.gd"
+GameState="*res://autoload/game_state.gd"
 MCPRuntime="*uid://c45lky7y6dsd1"
 
 [display]
