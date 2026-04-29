@@ -65,6 +65,7 @@ const STATE_COLORS := {
 @export var special_base_knockback := 9.0
 @export var special_knockback_scale := 0.14
 @export var damage_stun_duration := 0.28
+@export var invincibility_duration := 2.0
 
 var state := STATE_IDLE
 var damage_percent := 0.0
@@ -82,6 +83,7 @@ var last_input_action := ""
 var last_started_action := ""
 var jumps_used := 0
 var drop_through_remaining := 0.0
+var invincibility_remaining := 0.0
 
 var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
@@ -95,6 +97,7 @@ func _ready() -> void:
 		spawn_position = global_position
 	mesh_instance = get_node_or_null("MeshInstance3D") as MeshInstance3D
 	state_material = StandardMaterial3D.new()
+	state_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	if mesh_instance:
 		mesh_instance.material_override = state_material
 	_ensure_hitbox()
@@ -109,6 +112,7 @@ func _physics_process(delta: float) -> void:
 		_respawn()
 		if not is_inside_tree():
 			return
+	_tick_invincibility(delta)
 	_check_drop_through_input()
 	_tick_drop_through(delta)
 	_update_collision_mask()
@@ -135,6 +139,8 @@ func get_damage_percent() -> float:
 	return damage_percent
 
 func take_damage(amount: float, knockback: Vector3) -> void:
+	if state == STATE_SHIELD or invincibility_remaining > 0.0:
+		return
 	damage_percent += amount
 	velocity = knockback / maxf(weight, 0.1)
 	queued_action = ""
@@ -304,6 +310,17 @@ func _check_drop_through_input() -> void:
 	if _pressed_once(down_action) and is_on_floor():
 		drop_through_remaining = drop_through_duration
 
+func _tick_invincibility(delta: float) -> void:
+	if invincibility_remaining <= 0.0:
+		return
+	invincibility_remaining = maxf(invincibility_remaining - delta, 0.0)
+	if state_material:
+		# Blink every 0.1s by toggling alpha based on time remaining
+		var blink_on := int(invincibility_remaining * 10.0) % 2 == 0
+		state_material.albedo_color.a = 1.0 if blink_on else 0.2
+		if invincibility_remaining == 0.0:
+			state_material.albedo_color.a = 1.0
+
 func _tick_drop_through(delta: float) -> void:
 	if drop_through_remaining > 0.0:
 		drop_through_remaining = maxf(drop_through_remaining - delta, 0.0)
@@ -399,7 +416,9 @@ func _on_hitbox_body_entered(body: Node3D) -> void:
 func _set_state(next_state: String) -> void:
 	state = next_state
 	if state_material:
-		state_material.albedo_color = STATE_COLORS.get(state, Color.WHITE)
+		var color: Color = STATE_COLORS.get(state, Color.WHITE)
+		color.a = state_material.albedo_color.a
+		state_material.albedo_color = color
 
 func _is_out_of_bounds() -> bool:
 	return global_position.y < lower_death_y or global_position.y > upper_death_y or absf(global_position.z) > bounds_z
@@ -418,6 +437,7 @@ func _respawn() -> void:
 	queued_action = ""
 	jumps_used = 0
 	drop_through_remaining = 0.0
+	invincibility_remaining = invincibility_duration
 	_disable_hitbox()
 	_set_state(STATE_IDLE)
 	respawned.emit(_player_index())
