@@ -18,11 +18,16 @@ config/icon="res://icon.png"
 [autoload]
 
 GameState="*res://scripts/game_state.gd"
+MCPRuntime="*uid://c45lky7y6dsd1"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 
 [input]
 

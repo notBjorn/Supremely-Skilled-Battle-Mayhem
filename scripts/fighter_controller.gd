@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 signal damaged(player_idx: int, new_percent: float)
 signal died(player_idx: int)
+signal respawned(player_idx: int)
 
 const STATE_IDLE := "idle"
 const STATE_JUMP := "jump"
@@ -97,6 +98,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_out_of_bounds():
 		_respawn()
+		if not is_inside_tree():
+			return
 	_check_drop_through_input()
 	_tick_drop_through(delta)
 	_update_collision_mask()
@@ -333,7 +336,9 @@ func _on_hitbox_body_entered(body: Node3D) -> void:
 	var target_damage := 0.0
 	if body.has_method("get_damage_percent"):
 		target_damage = body.get_damage_percent()
-	var knockback_strength := current_base_knockback + target_damage * current_knockback_scale
+	# Use post-hit percent so the HUD number directly tracks knockback risk.
+	var resulting_damage := target_damage + current_attack_damage
+	var knockback_strength := current_base_knockback + resulting_damage * current_knockback_scale
 	body.take_damage(current_attack_damage, Vector3(0.0, knockback_strength * 0.45, facing_z * knockback_strength))
 
 func _set_state(next_state: String) -> void:
@@ -349,6 +354,8 @@ func _player_index() -> int:
 
 func _respawn() -> void:
 	died.emit(_player_index())
+	if not is_inside_tree():
+		return
 	global_position = spawn_position
 	velocity = Vector3.ZERO
 	damage_percent = 0.0
@@ -358,3 +365,4 @@ func _respawn() -> void:
 	drop_through_remaining = 0.0
 	_disable_hitbox()
 	_set_state(STATE_IDLE)
+	respawned.emit(_player_index())
