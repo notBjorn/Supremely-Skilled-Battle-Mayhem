@@ -25,7 +25,7 @@ mouse_filter = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 20.0
-offset_top = -130.0
+offset_top = -160.0
 offset_right = 260.0
 offset_bottom = -20.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
@@ -42,18 +42,25 @@ theme_override_colors/font_color = Color(0.4, 0.75, 1.0, 1)
 text = "0%"
 theme_override_font_sizes/font_size = 42
 
-[node name="Stocks" type="HBoxContainer" parent="Control/P1Panel/VBox"]
+[node name="LivesRow" type="HBoxContainer" parent="Control/P1Panel/VBox"]
+theme_override_constants/separation = 10
+
+[node name="LivesLabel" type="Label" parent="Control/P1Panel/VBox/LivesRow"]
+text = "Lives: 3"
+theme_override_font_sizes/font_size = 16
+
+[node name="Stocks" type="HBoxContainer" parent="Control/P1Panel/VBox/LivesRow"]
 theme_override_constants/separation = 6
 
-[node name="Stock1" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+[node name="Stock1" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(0.3, 0.65, 1.0, 1)
 
-[node name="Stock2" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+[node name="Stock2" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(0.3, 0.65, 1.0, 1)
 
-[node name="Stock3" type="ColorRect" parent="Control/P1Panel/VBox/Stocks"]
+[node name="Stock3" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(0.3, 0.65, 1.0, 1)
 
@@ -63,7 +70,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -260.0
-offset_top = -130.0
+offset_top = -160.0
 offset_right = -20.0
 offset_bottom = -20.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
@@ -82,18 +89,27 @@ text = "0%"
 horizontal_alignment = 2
 theme_override_font_sizes/font_size = 42
 
-[node name="Stocks" type="HBoxContainer" parent="Control/P2Panel/VBox"]
+[node name="LivesRow" type="HBoxContainer" parent="Control/P2Panel/VBox"]
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="LivesLabel" type="Label" parent="Control/P2Panel/VBox/LivesRow"]
+text = "Lives: 3"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="Stocks" type="HBoxContainer" parent="Control/P2Panel/VBox/LivesRow"]
 theme_override_constants/separation = 6
 alignment = 2
 
-[node name="Stock1" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+[node name="Stock1" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(1.0, 0.35, 0.35, 1)
 
-[node name="Stock2" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+[node name="Stock2" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(1.0, 0.35, 0.35, 1)
 
-[node name="Stock3" type="ColorRect" parent="Control/P2Panel/VBox/Stocks"]
+[node name="Stock3" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
 custom_minimum_size = Vector2(22, 22)
 color = Color(1.0, 0.35, 0.35, 1)
