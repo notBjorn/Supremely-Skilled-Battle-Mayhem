@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxvagwre2f6pn"
-path="res://.godot/imported/ProtoStageSSBM.glb-36c4c76f8c1a2889bc095cd519db0ffa.scn"
+path="res://.godot/imported/ProtoStageSSBM.glb-4ec655f5d7d824a703638c95ff33ffb4.scn"
 
 [deps]
 
-source_file="res://3dModels/ProtoStageSSBM.glb"
-dest_files=["res://.godot/imported/ProtoStageSSBM.glb-36c4c76f8c1a2889bc095cd519db0ffa.scn"]
+source_file="res://gameplay/stages/proto_stage/ProtoStageSSBM.glb"
+dest_files=["res://.godot/imported/ProtoStageSSBM.glb-4ec655f5d7d824a703638c95ff33ffb4.scn"]
 
 [params]
 
