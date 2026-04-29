@@ -48,6 +48,11 @@ const STATE_COLORS := {
 @export var drop_through_duration := 0.3
 @export var ground_layer_bit := 1
 @export var platform_layer_bit := 2
+@export var fighter_layer_bit := 4
+@export var pushbox_layer_bit := 8
+@export var pushbox_size := Vector3(0.55, 1.0, 0.55)
+@export var push_speed_threshold := 4.0
+@export var push_force := 8.0
 
 @export var attack_damage := 7.0
 @export var attack_duration := 0.36
@@ -82,6 +87,8 @@ var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
 var hitbox: Area3D
 var hitbox_shape: CollisionShape3D
+var pushbox: Area3D
+var pushbox_shape: CollisionShape3D
 
 func _ready() -> void:
 	if spawn_position == Vector3.ZERO:
@@ -91,6 +98,8 @@ func _ready() -> void:
 	if mesh_instance:
 		mesh_instance.material_override = state_material
 	_ensure_hitbox()
+	_ensure_pushbox()
+	collision_layer = fighter_layer_bit
 	collision_mask = ground_layer_bit | platform_layer_bit
 	_set_state(STATE_IDLE)
 	add_to_group("fighters")
@@ -117,6 +126,7 @@ func _physics_process(delta: float) -> void:
 	elif not _try_start_new_action():
 		_apply_movement(delta)
 	_apply_gravity(delta)
+	_apply_pushbox(delta)
 	move_and_slide()
 	_update_passive_state()
 	_position_hitbox()
@@ -167,7 +177,7 @@ func _ensure_hitbox() -> void:
 		add_child(hitbox)
 	hitbox.monitorable = false
 	hitbox.monitoring = false
-	hitbox.collision_mask = 1
+	hitbox.collision_mask = fighter_layer_bit
 	if not hitbox.body_entered.is_connected(_on_hitbox_body_entered):
 		hitbox.body_entered.connect(_on_hitbox_body_entered)
 	hitbox_shape = hitbox.get_node_or_null("HitboxShape") as CollisionShape3D
@@ -326,6 +336,51 @@ func _set_hitbox_enabled(enabled: bool) -> void:
 func _disable_hitbox() -> void:
 	hitbox_active_remaining = 0.0
 	_set_hitbox_enabled(false)
+
+func _ensure_pushbox() -> void:
+	pushbox = get_node_or_null("Pushbox") as Area3D
+	if pushbox == null:
+		pushbox = Area3D.new()
+		pushbox.name = "Pushbox"
+		add_child(pushbox)
+	pushbox.collision_layer = pushbox_layer_bit
+	pushbox.collision_mask = pushbox_layer_bit
+	pushbox.monitorable = true
+	pushbox.monitoring = true
+	pushbox_shape = pushbox.get_node_or_null("PushboxShape") as CollisionShape3D
+	if pushbox_shape == null:
+		pushbox_shape = CollisionShape3D.new()
+		pushbox_shape.name = "PushboxShape"
+		pushbox.add_child(pushbox_shape)
+	var box := BoxShape3D.new()
+	box.size = pushbox_size
+	pushbox_shape.shape = box
+
+# Melee-style soft push: fighters phase through each other, but slow grounded
+# overlaps get a gentle separation nudge. High relative speed = clean pass-through.
+func _apply_pushbox(delta: float) -> void:
+	if pushbox == null:
+		return
+	if state == STATE_ATTACK or state == STATE_DAMAGE:
+		return
+	if not is_on_floor():
+		return
+	for area in pushbox.get_overlapping_areas():
+		var other := area.get_parent()
+		if other == null or other == self:
+			continue
+		if not other.is_in_group("fighters"):
+			continue
+		if not other.is_on_floor():
+			continue
+		if other.state == STATE_ATTACK or other.state == STATE_DAMAGE:
+			continue
+		if absf(velocity.z - other.velocity.z) > push_speed_threshold:
+			continue
+		var direction := signf(global_position.z - other.global_position.z)
+		if direction == 0.0:
+			direction = 1.0 if _player_index() < other._player_index() else -1.0
+		velocity.z += direction * push_force * delta
 
 func _on_hitbox_body_entered(body: Node3D) -> void:
 	if body == self or hit_bodies.has(body):
