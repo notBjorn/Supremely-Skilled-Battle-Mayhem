@@ -46,6 +46,7 @@ const STATE_COLORS := {
 @export var max_jumps := 2
 @export var double_jump_velocity_scale := 0.95
 @export var drop_through_duration := 0.3
+@export var fast_fall_multiplier := 2.0
 @export var ground_layer_bit := 1
 @export var platform_layer_bit := 2
 @export var fighter_layer_bit := 4
@@ -84,6 +85,7 @@ var last_started_action := ""
 var jumps_used := 0
 var drop_through_remaining := 0.0
 var invincibility_remaining := 0.0
+var is_fast_falling := false
 
 var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
@@ -291,24 +293,31 @@ func _apply_movement(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0.0, run_speed * 12.0 * delta)
 
 func _apply_gravity(delta: float) -> void:
+	var effective_fall_limit := fall_speed_limit * (fast_fall_multiplier if is_fast_falling else 1.0)
 	if not is_on_floor():
-		velocity.y = maxf(velocity.y - gravity * delta, -fall_speed_limit)
+		velocity.y = maxf(velocity.y - gravity * delta, -effective_fall_limit)
 	else:
 		if velocity.y < 0.0:
 			velocity.y = 0.0
 		jumps_used = 0
+		is_fast_falling = false
 
 func _try_jump() -> bool:
 	if jumps_used >= max_jumps:
 		return false
+	is_fast_falling = false
 	var scale_factor := 1.0 if jumps_used == 0 else double_jump_velocity_scale
 	velocity.y = jump_velocity * scale_factor
 	jumps_used += 1
 	return true
 
 func _check_drop_through_input() -> void:
-	if _pressed_once(down_action) and is_on_floor():
-		drop_through_remaining = drop_through_duration
+	if _pressed_once(down_action):
+		if is_on_floor():
+			drop_through_remaining = drop_through_duration
+		elif not is_fast_falling and velocity.y <= 0.0:
+			is_fast_falling = true
+			velocity.y = -fall_speed_limit * fast_fall_multiplier
 
 func _tick_invincibility(delta: float) -> void:
 	if invincibility_remaining <= 0.0:
@@ -438,6 +447,7 @@ func _respawn() -> void:
 	jumps_used = 0
 	drop_through_remaining = 0.0
 	invincibility_remaining = invincibility_duration
+	is_fast_falling = false
 	_disable_hitbox()
 	_set_state(STATE_IDLE)
 	respawned.emit(_player_index())
