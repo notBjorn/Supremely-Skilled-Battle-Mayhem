@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dk6botej7maj5"]
 
-[ext_resource type="Texture2D" uid="uid://d32yn2yydrlpy" path="res://images/RustStage.png" id="1_6eo5e"]
+[ext_resource type="Texture2D" uid="uid://d32yn2yydrlpy" path="res://gameplay/stages/proto_stage/RustStage.png" id="1_6eo5e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x1kum"]
 size = Vector2(1202, 60)

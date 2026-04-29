@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmegm3qup17ys"]
 
-[ext_resource type="Script" uid="uid://crirs0tb8ahm1" path="res://scripts/fighter_controller.gd" id="1_iwpo4"]
+[ext_resource type="Script" uid="uid://crirs0tb8ahm1" path="res://gameplay/fighters/fighter_controller.gd" id="1_iwpo4"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_bu0v1"]
 radius = 0.25

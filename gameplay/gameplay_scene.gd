@@ -50,4 +50,4 @@ func _end_game(winner: int) -> void:
 		return
 	game_over = true
 	GameState.winner = winner
-	get_tree().change_scene_to_file("res://scenes/ResultsScreen.tscn")
+	get_tree().change_scene_to_file("res://menus/results_screen.tscn")
