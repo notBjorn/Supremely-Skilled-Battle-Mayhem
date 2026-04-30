@@ -21,6 +21,8 @@ func _ready() -> void:
 		fighter.damaged.connect(_on_fighter_damaged)
 		fighter.died.connect(_on_fighter_died)
 		fighter.respawned.connect(_on_fighter_respawned)
+	for zone in get_tree().get_nodes_in_group("death_zones"):
+		zone.body_entered.connect(_on_death_zone_body_entered)
 
 func _on_fighter_damaged(player_idx: int, new_percent: float) -> void:
 	hud.update_percent(player_idx, new_percent)
@@ -44,6 +46,10 @@ func _on_fighter_died(player_idx: int) -> void:
 
 func _on_fighter_respawned(player_idx: int) -> void:
 	stock_loss_locked[player_idx] = false
+
+func _on_death_zone_body_entered(body: Node3D) -> void:
+	if body.is_in_group("fighters") and body.has_method("kill"):
+		body.kill()
 
 func _end_game(winner: int) -> void:
 	if game_over:
