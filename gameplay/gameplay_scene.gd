@@ -1,6 +1,6 @@
 extends Node3D
 
-const MAX_STOCKS := 3
+const MAX_STOCKS := 4
 
 var p1_stocks := MAX_STOCKS
 var p2_stocks := MAX_STOCKS
