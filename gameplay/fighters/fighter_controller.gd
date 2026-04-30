@@ -35,18 +35,15 @@ const STATE_COLORS := {
 @export var dodge_action := "p1_dodge"
 
 @export var run_speed := 7.0
-@export var jump_velocity := 8.5
-@export var gravity := 24.0
+@export var jump_velocity := 11
+@export var gravity := 31.0
 @export var weight := 1.0
-@export var fall_speed_limit := 16.0
+@export var fall_speed_limit := 10.0
 @export var spawn_position := Vector3.ZERO
-@export var bounds_z := 19.0
-@export var lower_death_y := -12.0
-@export var upper_death_y := 12.0
 @export var max_jumps := 2
-@export var double_jump_velocity_scale := 0.95
+@export var double_jump_velocity_scale := 0.80
 @export var drop_through_duration := 0.3
-@export var fast_fall_multiplier := 2.0
+@export var fast_fall_multiplier := 1.35
 @export var ground_layer_bit := 1
 @export var platform_layer_bit := 2
 @export var fighter_layer_bit := 4
@@ -114,10 +111,6 @@ func _ready() -> void:
 	add_to_group("fighters")
 
 func _physics_process(delta: float) -> void:
-	if _is_out_of_bounds():
-		_respawn()
-		if not is_inside_tree():
-			return
 	_tick_invincibility(delta)
 	_check_drop_through_input()
 	_tick_drop_through(delta)
@@ -454,11 +447,11 @@ func _set_state(next_state: String) -> void:
 		elif prev_state == STATE_SHIELD and next_state != STATE_SHIELD:
 			sfx_shield.stop()
 
-func _is_out_of_bounds() -> bool:
-	return global_position.y < lower_death_y or global_position.y > upper_death_y or absf(global_position.z) > bounds_z
-
 func _player_index() -> int:
 	return 2 if player_label == "P2" else 1
+
+func kill() -> void:
+	_respawn()
 
 func _respawn() -> void:
 	died.emit(_player_index())

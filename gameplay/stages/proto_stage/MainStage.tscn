@@ -22,8 +22,9 @@ size = Vector3(1.5, 0.15, 2.5)
 
 [node name="ProtoStageSSBM" parent="." unique_id=232341958 instance=ExtResource("1_a202f")]
 
-[node name="DeathBox" type="Area3D" parent="." unique_id=1466533038]
+[node name="DeathBox" type="Area3D" parent="." groups=["death_zones"] unique_id=1466533038]
 transform = Transform3D(1.14, 0, 0, 0, 1.14, 0, 0, 0, 1.14, 0, 0, 0)
+collision_mask = 4
 
 [node name="Bottom" type="CollisionShape3D" parent="DeathBox" unique_id=1030946630]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
