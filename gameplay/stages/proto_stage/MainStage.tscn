@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bm64najw6vh12" path="res://gameplay/stages/proto_stage/StageProper.tscn" id="1_a202f"]
 [ext_resource type="PackedScene" uid="uid://cmegm3qup17ys" path="res://gameplay/fighters/character_body_3d.tscn" id="2_x3qch"]
+[ext_resource type="Script" uid="uid://cpg1dc8hgyrb7" path="res://gameplay/stages/proto_stage/camera_controller.gd" id="3_ii0ls"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_noarx"]
 size = Vector3(10, 4, 45)
@@ -22,7 +23,7 @@ size = Vector3(1.5, 0.15, 2.5)
 
 [node name="ProtoStageSSBM" parent="." unique_id=232341958 instance=ExtResource("1_a202f")]
 
-[node name="DeathBox" type="Area3D" parent="." groups=["death_zones"] unique_id=1466533038]
+[node name="DeathBox" type="Area3D" parent="." unique_id=1466533038 groups=["death_zones"]]
 transform = Transform3D(1.14, 0, 0, 0, 1.14, 0, 0, 0, 1.14, 0, 0, 0)
 collision_mask = 4
 
@@ -80,9 +81,10 @@ material_override = SubResource("StdMat_plat")
 mesh = SubResource("BoxMesh_plat")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1147411128]
-transform = Transform3D(-4.371139e-08, -0.309017, 0.95105654, 0, 0.95105654, 0.309017, -1, 1.3507562e-08, -4.1572e-08, 9.045, 5, 0)
+transform = Transform3D(-4.371139e-08, -0.35836795, 0.9335804, 0, 0.9335804, 0.35836795, -1, 1.566476e-08, -4.0808096e-08, 9.045, 9, 0)
 current = true
 fov = 55.0
+script = ExtResource("3_ii0ls")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1779248125]
 transform = Transform3D(-0.29577634, 0.9541636, 0.045696154, -0.0029822045, -0.04875858, 0.9988061, 0.9552526, 0.29528695, 0.017267145, 3.045, 9.125, 0)
