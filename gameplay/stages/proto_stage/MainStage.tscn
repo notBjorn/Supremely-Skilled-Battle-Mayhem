@@ -19,6 +19,26 @@ albedo_color = Color(0.45, 0.7, 0.95, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_plat"]
 size = Vector3(1.5, 0.15, 2.5)
 
+[sub_resource type="Gradient" id="Gradient_ii0ls"]
+offsets = PackedFloat32Array(0.13271604, 0.74691355, 1)
+colors = PackedColorArray(0.96572214, 0.4426273, 1.92523e-07, 1, 0.821086, 0.3406208, 0.975151, 1, 0.65517455, 0.18617213, 0.9417991, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xaowm"]
+gradient = SubResource("Gradient_ii0ls")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5176991, 0.9734513)
+fill_to = Vector2(0.48893806, 0.30973452)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ii0ls"]
+albedo_texture = SubResource("GradientTexture2D_xaowm")
+
+[sub_resource type="QuadMesh" id="QuadMesh_xaowm"]
+material = SubResource("StandardMaterial3D_ii0ls")
+size = Vector2(110, 110)
+orientation = 0
+
 [node name="Main Stage" type="Node3D" unique_id=1020640790]
 
 [node name="ProtoStageSSBM" parent="." unique_id=232341958 instance=ExtResource("1_a202f")]
@@ -89,3 +109,7 @@ script = ExtResource("3_ii0ls")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1779248125]
 transform = Transform3D(-0.29577634, 0.9541636, 0.045696154, -0.0029822045, -0.04875858, 0.9988061, 0.9552526, 0.29528695, 0.017267145, 3.045, 9.125, 0)
 light_energy = 1.975
+
+[node name="Sky" type="MeshInstance3D" parent="." unique_id=80229915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+mesh = SubResource("QuadMesh_xaowm")

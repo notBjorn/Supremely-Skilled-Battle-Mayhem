@@ -97,7 +97,7 @@ var sfx_shield: AudioStreamPlayer
 func _ready() -> void:
 	if spawn_position == Vector3.ZERO:
 		spawn_position = global_position
-	mesh_instance = get_node_or_null("MeshInstance3D") as MeshInstance3D
+	mesh_instance = get_node_or_null("Body") as MeshInstance3D
 	state_material = StandardMaterial3D.new()
 	state_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	if mesh_instance:
@@ -142,6 +142,9 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 		return
 	damage_percent += amount
 	velocity = knockback / maxf(weight, 0.1)
+	if velocity.z != 0.0:
+		facing_z = signf(velocity.z)
+		rotation.y = PI if facing_z > 0.0 else 0.0
 	queued_action = ""
 	action_lock_remaining = damage_stun_duration
 	_disable_hitbox()
@@ -287,6 +290,7 @@ func _apply_movement(delta: float) -> void:
 	var direction := Input.get_axis(move_right_action, move_left_action)
 	if direction != 0.0:
 		facing_z = signf(direction)
+		rotation.y = PI if facing_z > 0.0 else 0.0
 	velocity.z = move_toward(velocity.z, direction * run_speed, run_speed * 8.0 * delta)
 	if Input.is_action_pressed(down_action) and is_on_floor():
 		velocity.z = move_toward(velocity.z, 0.0, run_speed * 12.0 * delta)
@@ -352,7 +356,7 @@ func _update_passive_state() -> void:
 func _position_hitbox() -> void:
 	if hitbox == null:
 		return
-	hitbox.position = Vector3(0.0, 0.1, facing_z * 0.475)
+	hitbox.position = Vector3(0.0, 0.1, -0.475)
 
 func _set_hitbox_enabled(enabled: bool) -> void:
 	if hitbox == null or hitbox_shape == null:
