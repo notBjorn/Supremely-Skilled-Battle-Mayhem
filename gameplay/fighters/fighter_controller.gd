@@ -93,6 +93,7 @@ var last_started_action := ""
 var jumps_used := 0
 var drop_through_remaining := 0.0
 var invincibility_remaining := 0.0
+var was_on_floor := false
 var is_fast_falling := false
 
 var mesh_instance: MeshInstance3D
@@ -140,6 +141,10 @@ func _physics_process(delta: float) -> void:
 		_queue_action_during_lock()
 		_apply_gravity(delta)
 		move_and_slide()
+		if is_on_floor() and not was_on_floor:
+			jumps_used = 0
+			is_fast_falling = false
+		was_on_floor = is_on_floor()
 		_update_animation()
 		_position_hitbox()
 		return
@@ -152,6 +157,10 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	_apply_pushbox(delta)
 	move_and_slide()
+	if is_on_floor() and not was_on_floor:
+		jumps_used = 0
+		is_fast_falling = false
+	was_on_floor = is_on_floor()
 	_update_passive_state()
 	_update_animation()
 	_position_hitbox()
@@ -338,8 +347,6 @@ func _apply_gravity(delta: float) -> void:
 	else:
 		if velocity.y < 0.0:
 			velocity.y = 0.0
-		jumps_used = 0
-		is_fast_falling = false
 
 func _try_jump() -> bool:
 	if jumps_used >= max_jumps:
@@ -598,6 +605,7 @@ func _respawn() -> void:
 	jumps_used = 0
 	drop_through_remaining = 0.0
 	invincibility_remaining = invincibility_duration
+	was_on_floor = false
 	is_fast_falling = false
 	_disable_hitbox()
 	_set_state(STATE_IDLE)
