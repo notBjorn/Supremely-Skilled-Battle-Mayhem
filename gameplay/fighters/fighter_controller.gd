@@ -9,6 +9,7 @@ const STATE_JUMP := "jump"
 const STATE_ATTACK := "attack"
 const STATE_DAMAGE := "damage"
 const STATE_SHIELD := "shield"
+const STATE_LEDGE := "ledge"
 
 const ACTION_ATTACK := "attack"
 const ACTION_SPECIAL := "special"
@@ -64,6 +65,10 @@ const STATE_COLORS := {
 @export var special_knockback_scale := 0.14
 @export var damage_stun_duration := 0.28
 @export var invincibility_duration := 2.0
+@export var ledge_hang_invincibility := 1.5
+@export var ledge_regrab_cooldown := 0.50
+@export var ledge_release_jump_scale := 1.0
+
 @export var idle_animation := "Idle"
 @export var run_animation := "Run"
 @export var jump_animation := "Jump"
@@ -95,6 +100,8 @@ var drop_through_remaining := 0.0
 var invincibility_remaining := 0.0
 var was_on_floor := false
 var is_fast_falling := false
+var current_ledge: Ledge = null
+var ledge_grab_cooldown_remaining := 0.0
 
 var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
@@ -133,6 +140,10 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_tick_invincibility(delta)
+	_tick_ledge_cooldown(delta)
+	if state == STATE_LEDGE:
+		_handle_ledge_state(delta)
+		return
 	_check_drop_through_input()
 	_tick_drop_through(delta)
 	_update_collision_mask()
@@ -171,6 +182,8 @@ func get_damage_percent() -> float:
 func take_damage(amount: float, knockback: Vector3) -> void:
 	if state == STATE_SHIELD or invincibility_remaining > 0.0:
 		return
+	if state == STATE_LEDGE:		# Release Ledge on damage
+		_release_current_ledge()
 	damage_percent += amount
 	velocity = knockback / maxf(weight, 0.1)
 	if velocity.z != 0.0:
@@ -183,6 +196,8 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 	damaged.emit(_player_index(), damage_percent)
 
 func _input(event: InputEvent) -> void:
+	if state == STATE_LEDGE:
+		return
 	input_event_count += 1
 	var requested_action := _event_to_action(event)
 	last_input_action = requested_action
@@ -517,6 +532,45 @@ func _set_state(next_state: String) -> void:
 	if shield_visual:
 		shield_visual.visible = next_state == STATE_SHIELD
 	_update_animation()
+	
+	
+# we enter here from the ledge script when a body enters the ledge
+func enter_ledge_grab(ledge: Ledge) -> void:
+	if current_ledge != null and current_ledge != ledge: #cleanup old ledge if not released
+		current_ledge.release(self)
+	current_ledge = ledge
+	velocity = Vector3.ZERO
+	global_position = ledge.get_hang_position()
+	action_lock_remaining = 0.0
+	queued_action = ""
+	hitbox_active_remaining = 0.0
+	_disable_hitbox()
+	invincibility_remaining = ledge_hang_invincibility
+	is_fast_falling = false
+	jumps_used = 0                       # ledge grab refreshes jumps
+	_set_state(STATE_LEDGE)
+
+func _handle_ledge_state(delta: float) -> void:
+	velocity = Vector3.ZERO
+	if Input.is_action_just_pressed(jump_action):
+		_release_ledge_and_jump()
+
+func _release_ledge_and_jump() -> void:
+	_release_current_ledge()
+	velocity.y = jump_velocity * ledge_release_jump_scale
+	jumps_used = 1
+	_set_state(STATE_JUMP)
+	_play_animation(jump_animation, true)
+
+func _release_current_ledge() -> void:
+	if current_ledge != null:
+		current_ledge.release(self)
+	current_ledge = null
+	ledge_grab_cooldown_remaining = ledge_regrab_cooldown
+
+func _tick_ledge_cooldown(delta: float) -> void:
+	if ledge_grab_cooldown_remaining > 0.0:
+		ledge_grab_cooldown_remaining = maxf(ledge_grab_cooldown_remaining - delta, 0.0)
 
 func _configure_animation_loops() -> void:
 	if animation_player == null:
@@ -594,6 +648,7 @@ func kill() -> void:
 	_respawn()
 
 func _respawn() -> void:
+	_release_current_ledge()
 	died.emit(_player_index())
 	if not is_inside_tree():
 		return
