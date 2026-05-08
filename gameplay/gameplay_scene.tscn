@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://nkqyrytmv0cd"]
 
 [ext_resource type="Script" uid="uid://rhmaog3ubix4" path="res://gameplay/gameplay_scene.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://ckpotuqgtjtfq" path="res://MainStage.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://ckpotuqgtjtfq" path="res://gameplay/stages/proto_stage/MainStage.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://gameplay/ui/hud.tscn" id="4"]
 
 [sub_resource type="Environment" id="Env_1"]

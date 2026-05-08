@@ -1,0 +1,7 @@
+Animated Human by Quaternius
+
+Source: https://opengameart.org/content/animated-human-low-poly
+Downloaded file: Animated Human by @Quaternius_0.zip
+License: CC0 1.0 Universal
+
+Imported into this project as animated_human.glb from the original Blender file.

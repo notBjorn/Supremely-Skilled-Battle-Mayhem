@@ -64,6 +64,16 @@ const STATE_COLORS := {
 @export var special_knockback_scale := 0.14
 @export var damage_stun_duration := 0.28
 @export var invincibility_duration := 2.0
+@export var idle_animation := "Idle"
+@export var run_animation := "Run"
+@export var jump_animation := "Jump"
+@export var attack_animation := "Punch"
+@export var special_animation := "Working"
+@export var shield_animation := "Idle"
+@export var dodge_animation := "Jump"
+@export var damage_animation := "Jump"
+@export var attack_animation_speed := 3.0
+@export var attack_animation_visible_duration := 0.35
 
 var state := STATE_IDLE
 var damage_percent := 0.0
@@ -71,6 +81,7 @@ var facing_z := 1.0
 var action_lock_remaining := 0.0
 var hitbox_active_remaining := 0.0
 var queued_action := ""
+var attack_animation_remaining := 0.0
 var current_attack_damage := 0.0
 var current_base_knockback := 0.0
 var current_knockback_scale := 0.0
@@ -86,6 +97,7 @@ var is_fast_falling := false
 
 var mesh_instance: MeshInstance3D
 var state_material: StandardMaterial3D
+var model_root: Node3D
 var hitbox: Area3D
 var hitbox_shape: CollisionShape3D
 var pushbox: Area3D
@@ -93,6 +105,9 @@ var pushbox_shape: CollisionShape3D
 var sfx_jump: AudioStreamPlayer
 var sfx_punch: AudioStreamPlayer
 var sfx_shield: AudioStreamPlayer
+var animation_player: AnimationPlayer
+var shield_visual: MeshInstance3D
+var current_animation := ""
 
 func _ready() -> void:
 	if spawn_position == Vector3.ZERO:
@@ -102,12 +117,17 @@ func _ready() -> void:
 	state_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	if mesh_instance:
 		mesh_instance.material_override = state_material
+	model_root = get_node_or_null("Model") as Node3D
 	_ensure_hitbox()
 	_ensure_pushbox()
+	_ensure_shield_visual()
 	_setup_audio()
+	animation_player = _find_animation_player(self)
+	_configure_animation_loops()
 	collision_layer = fighter_layer_bit
 	collision_mask = ground_layer_bit | platform_layer_bit
 	_set_state(STATE_IDLE)
+	_update_animation()
 	add_to_group("fighters")
 
 func _physics_process(delta: float) -> void:
@@ -120,6 +140,7 @@ func _physics_process(delta: float) -> void:
 		_queue_action_during_lock()
 		_apply_gravity(delta)
 		move_and_slide()
+		_update_animation()
 		_position_hitbox()
 		return
 	if not queued_action.is_empty():
@@ -132,6 +153,7 @@ func _physics_process(delta: float) -> void:
 	_apply_pushbox(delta)
 	move_and_slide()
 	_update_passive_state()
+	_update_animation()
 	_position_hitbox()
 
 func get_damage_percent() -> float:
@@ -144,7 +166,7 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 	velocity = knockback / maxf(weight, 0.1)
 	if velocity.z != 0.0:
 		facing_z = signf(velocity.z)
-		rotation.y = PI if facing_z > 0.0 else 0.0
+		_update_facing()
 	queued_action = ""
 	action_lock_remaining = damage_stun_duration
 	_disable_hitbox()
@@ -164,17 +186,23 @@ func _input(event: InputEvent) -> void:
 		_start_action(requested_action)
 
 func _event_to_action(event: InputEvent) -> String:
-	if event.is_action_pressed(attack_action):
+	if _event_pressed_action(event, attack_action):
 		return ACTION_ATTACK
-	if event.is_action_pressed(special_action):
+	if _event_pressed_action(event, special_action):
 		return ACTION_SPECIAL
-	if event.is_action_pressed(dodge_action):
+	if _event_pressed_action(event, dodge_action):
 		return ACTION_DODGE
-	if event.is_action_pressed(jump_action):
+	if _event_pressed_action(event, jump_action):
 		return ACTION_JUMP
-	if event.is_action_pressed(shield_action):
+	if _event_pressed_action(event, shield_action):
 		return ACTION_SHIELD
 	return ""
+
+func _event_pressed_action(event: InputEvent, action_name: String) -> bool:
+	if not event.is_action_pressed(action_name):
+		return false
+	previous_action_states[action_name] = true
+	return true
 
 # Runtime-created hitbox keeps the scene file simple while still giving each fighter an attack volume.
 func _ensure_hitbox() -> void:
@@ -232,12 +260,16 @@ func _start_action(action: String) -> void:
 	last_started_action = action
 	match action:
 		ACTION_ATTACK:
+			attack_animation_remaining = attack_animation_visible_duration
 			_start_attack(attack_damage, attack_duration, attack_active_time, attack_base_knockback, attack_knockback_scale)
+			_play_animation(attack_animation, true, attack_animation_speed)
 		ACTION_SPECIAL:
 			_start_attack(special_damage, special_duration, special_active_time, special_base_knockback, special_knockback_scale)
+			_play_animation(special_animation, true)
 		ACTION_JUMP:
-			_try_jump()
-			_set_state(STATE_JUMP)
+			if _try_jump():
+				_set_state(STATE_JUMP)
+				_play_animation(jump_animation, true)
 		ACTION_SHIELD:
 			if is_on_floor():
 				velocity.z = 0.0
@@ -246,6 +278,7 @@ func _start_action(action: String) -> void:
 			velocity.z = facing_z * run_speed * 1.4
 			action_lock_remaining = 0.25
 			_set_state(STATE_SHIELD)
+			_play_animation(dodge_animation, true)
 
 func _start_attack(damage: float, duration: float, active_time: float, base_knockback: float, knockback_scale: float) -> void:
 	velocity.z = 0.0
@@ -277,11 +310,14 @@ func _tick_action_locks(delta: float) -> void:
 		hitbox_active_remaining = maxf(hitbox_active_remaining - delta, 0.0)
 		if hitbox_active_remaining == 0.0:
 			_disable_hitbox()
+	if attack_animation_remaining > 0.0:
+		attack_animation_remaining = maxf(attack_animation_remaining - delta, 0.0)
 	if was_locked and action_lock_remaining == 0.0:
 		_finish_locked_action()
 
 func _finish_locked_action() -> void:
 	_disable_hitbox()
+	attack_animation_remaining = 0.0
 	if not queued_action.is_empty():
 		return
 	_set_state(STATE_JUMP if not is_on_floor() else STATE_IDLE)
@@ -290,7 +326,7 @@ func _apply_movement(delta: float) -> void:
 	var direction := Input.get_axis(move_right_action, move_left_action)
 	if direction != 0.0:
 		facing_z = signf(direction)
-		rotation.y = PI if facing_z > 0.0 else 0.0
+		_update_facing()
 	velocity.z = move_toward(velocity.z, direction * run_speed, run_speed * 8.0 * delta)
 	if Input.is_action_pressed(down_action) and is_on_floor():
 		velocity.z = move_toward(velocity.z, 0.0, run_speed * 12.0 * delta)
@@ -356,7 +392,7 @@ func _update_passive_state() -> void:
 func _position_hitbox() -> void:
 	if hitbox == null:
 		return
-	hitbox.position = Vector3(0.0, 0.1, -0.475)
+	hitbox.position = Vector3(0.0, 0.1, facing_z * 0.475)
 
 func _set_hitbox_enabled(enabled: bool) -> void:
 	if hitbox == null or hitbox_shape == null:
@@ -397,6 +433,27 @@ func _setup_audio() -> void:
 	sfx_shield = AudioStreamPlayer.new()
 	sfx_shield.stream = load("res://gameplay/fighters/sounds/shield_audio.wav")
 	add_child(sfx_shield)
+
+func _ensure_shield_visual() -> void:
+	shield_visual = get_node_or_null("ShieldVisual") as MeshInstance3D
+	if shield_visual == null:
+		shield_visual = MeshInstance3D.new()
+		shield_visual.name = "ShieldVisual"
+		add_child(shield_visual)
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.55
+	sphere.height = 1.1
+	sphere.radial_segments = 32
+	sphere.rings = 16
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(0.25, 0.65, 1.0, 0.24)
+	material.emission_enabled = true
+	material.emission = Color(0.12, 0.35, 0.8)
+	material.emission_energy_multiplier = 0.45
+	shield_visual.mesh = sphere
+	shield_visual.material_override = material
+	shield_visual.visible = false
 
 # Melee-style soft push: fighters phase through each other, but slow grounded
 # overlaps get a gentle separation nudge. High relative speed = clean pass-through.
@@ -450,6 +507,78 @@ func _set_state(next_state: String) -> void:
 			sfx_shield.play()
 		elif prev_state == STATE_SHIELD and next_state != STATE_SHIELD:
 			sfx_shield.stop()
+	if shield_visual:
+		shield_visual.visible = next_state == STATE_SHIELD
+	_update_animation()
+
+func _configure_animation_loops() -> void:
+	if animation_player == null:
+		return
+	_set_animation_loop(idle_animation, true)
+	_set_animation_loop(run_animation, true)
+	_set_animation_loop(shield_animation, true)
+	_set_animation_loop(attack_animation, false)
+	_set_animation_loop(special_animation, false)
+	_set_animation_loop(jump_animation, false)
+	_set_animation_loop(dodge_animation, false)
+	_set_animation_loop(damage_animation, false)
+
+func _set_animation_loop(animation_name: String, should_loop: bool) -> void:
+	if animation_player == null or animation_name.is_empty() or not animation_player.has_animation(animation_name):
+		return
+	var animation := animation_player.get_animation(animation_name)
+	animation.loop_mode = Animation.LOOP_LINEAR if should_loop else Animation.LOOP_NONE
+
+func _update_animation() -> void:
+	if animation_player == null:
+		return
+	var animation_name := _animation_for_current_state()
+	_play_animation(animation_name, false, _animation_speed_for_current_state())
+
+func _animation_for_current_state() -> String:
+	match state:
+		STATE_ATTACK:
+			if last_started_action == ACTION_ATTACK and attack_animation_remaining == 0.0:
+				return idle_animation
+			return special_animation if last_started_action == ACTION_SPECIAL else attack_animation
+		STATE_DAMAGE:
+			return damage_animation
+		STATE_JUMP:
+			return jump_animation
+		STATE_SHIELD:
+			return shield_animation if last_started_action != ACTION_DODGE else dodge_animation
+		_:
+			if is_on_floor() and absf(velocity.z) > 0.2:
+				return run_animation
+			return idle_animation
+
+func _animation_speed_for_current_state() -> float:
+	if state == STATE_ATTACK and last_started_action == ACTION_ATTACK and attack_animation_remaining > 0.0:
+		return attack_animation_speed
+	return 1.0
+
+func _play_animation(animation_name: String, force_restart := false, custom_speed := 1.0) -> void:
+	if animation_player == null or animation_name.is_empty():
+		return
+	if not animation_player.has_animation(animation_name):
+		return
+	if current_animation == animation_name and not force_restart:
+		return
+	current_animation = animation_name
+	animation_player.play(animation_name, -1.0, custom_speed)
+
+func _update_facing() -> void:
+	if model_root:
+		model_root.rotation.y = 0.0 if facing_z > 0.0 else PI
+
+func _find_animation_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node
+	for child in node.get_children():
+		var found := _find_animation_player(child)
+		if found:
+			return found
+	return null
 
 func _player_index() -> int:
 	return 2 if player_label == "P2" else 1
