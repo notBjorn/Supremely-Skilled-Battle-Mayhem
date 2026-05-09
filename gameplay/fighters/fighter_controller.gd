@@ -480,6 +480,7 @@ func _ensure_shield_visual() -> void:
 	material.emission_energy_multiplier = 0.45
 	shield_visual.mesh = sphere
 	shield_visual.material_override = material
+	shield_visual.position = Vector3(0, 0.5, 0)
 	shield_visual.visible = false
 
 # Melee-style soft push: fighters phase through each other, but slow grounded
