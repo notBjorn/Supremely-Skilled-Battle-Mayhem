@@ -457,7 +457,7 @@ func _setup_audio() -> void:
 	sfx_shield.stream = load("res://gameplay/fighters/sounds/shield_audio.wav")
 	add_child(sfx_shield)
 	sfx_death = AudioStreamPlayer.new()
-	sfx_death.stream = load("res:://gameplay/fighters/sounds/8.mp3")
+	sfx_death.stream = load("res://gameplay/fighters/sounds/death_sound.wav")
 	add_child(sfx_death)
 	
 
@@ -651,14 +651,7 @@ func _player_index() -> int:
 
 func kill() -> void:
 	if sfx_death:
-		deathsound.play()
 		sfx_death.play()
-	visible = false
-	
-	await get_tree().create_timer(1.0).timeout
-	
-	visible = true
-	
 	_respawn()
 
 func _respawn() -> void:
