@@ -11,7 +11,7 @@ height = 1.0
 collision_mask = 3
 script = ExtResource("1_iwpo4")
 
-[node name="Model" parent="." unique_id=2139201835 instance=ExtResource("2_x42bd")]
+[node name="Model" parent="." unique_id=511820977 instance=ExtResource("2_x42bd")]
 transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0, 0)
 
 [node name="body_hurtbox" type="CollisionShape3D" parent="." unique_id=190318176]

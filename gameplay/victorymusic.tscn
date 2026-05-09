@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://c6kessbe6s3tv"]
+
+[ext_resource type="AudioStream" uid="uid://fnthpv8lo4ld" path="res://gameplay/fighters/sounds/Victory!.wav" id="1_3xqmr"]
+[ext_resource type="Script" uid="uid://ci5gp75iyhb7r" path="res://victorymusic.gd" id="2_jeno6"]
+
+[node name="victorymusic" type="AudioStreamPlayer" unique_id=1886897201]
+stream = ExtResource("1_3xqmr")
+script = ExtResource("2_jeno6")

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bjmm5m8kr3cb2"]
+
+[ext_resource type="AudioStream" uid="uid://dx68iwhod1oqq" path="res://gameplay/fighters/sounds/Battle in the winter.mp3" id="1_640nx"]
+[ext_resource type="Script" uid="uid://jny6fs3n41uk" path="res://music_manager.gd" id="2_cfmat"]
+
+[node name="MusicManager" type="AudioStreamPlayer" unique_id=1761309280]
+stream = ExtResource("1_640nx")
+script = ExtResource("2_cfmat")

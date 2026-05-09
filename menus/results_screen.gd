@@ -3,9 +3,15 @@ extends Control
 @onready var winner_label: Label = $CenterContainer/VBoxContainer/WinnerLabel
 
 func _ready() -> void:
+	musicmanager.stop()
+	victorymusic.play()
 	winner_label.text = "Player %d Wins!" % GameState.winner
+	
+	
 
 func _on_replay_button_pressed() -> void:
+	victorymusic.stop()
+	musicmanager.play()
 	GameState.winner = 0
 	get_tree().change_scene_to_file("res://gameplay/gameplay_scene.tscn")
 

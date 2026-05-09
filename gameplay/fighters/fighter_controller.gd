@@ -113,6 +113,7 @@ var pushbox_shape: CollisionShape3D
 var sfx_jump: AudioStreamPlayer
 var sfx_punch: AudioStreamPlayer
 var sfx_shield: AudioStreamPlayer
+var sfx_death: AudioStreamPlayer
 var animation_player: AnimationPlayer
 var shield_visual: MeshInstance3D
 var current_animation := ""
@@ -455,6 +456,10 @@ func _setup_audio() -> void:
 	sfx_shield = AudioStreamPlayer.new()
 	sfx_shield.stream = load("res://gameplay/fighters/sounds/shield_audio.wav")
 	add_child(sfx_shield)
+	sfx_death = AudioStreamPlayer.new()
+	sfx_death.stream = load("res:://gameplay/fighters/sounds/8.mp3")
+	add_child(sfx_death)
+	
 
 func _ensure_shield_visual() -> void:
 	shield_visual = get_node_or_null("ShieldVisual") as MeshInstance3D
@@ -645,6 +650,15 @@ func _player_index() -> int:
 	return 2 if player_label == "P2" else 1
 
 func kill() -> void:
+	if sfx_death:
+		deathsound.play()
+		sfx_death.play()
+	visible = false
+	
+	await get_tree().create_timer(1.0).timeout
+	
+	visible = true
+	
 	_respawn()
 
 func _respawn() -> void:

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b85uoj7uyhik1"]
+
+[ext_resource type="AudioStream" uid="uid://cx04ip67wd3ed" path="res://gameplay/fighters/sounds/death_sound.wav" id="1_pveuw"]
+
+[node name="DeathSound" type="AudioStreamPlayer" unique_id=62570360]
+stream = ExtResource("1_pveuw")
