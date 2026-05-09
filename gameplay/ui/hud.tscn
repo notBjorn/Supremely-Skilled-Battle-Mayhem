@@ -13,6 +13,17 @@ content_margin_top = 10.0
 content_margin_right = 14.0
 content_margin_bottom = 10.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer"]
+bg_color = Color(0.0, 0.0, 0.0, 0.72)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1")
 
@@ -46,23 +57,12 @@ theme_override_font_sizes/font_size = 42
 theme_override_constants/separation = 10
 
 [node name="LivesLabel" type="Label" parent="Control/P1Panel/VBox/LivesRow"]
+visible = false
 text = "Lives: 3"
 theme_override_font_sizes/font_size = 16
 
 [node name="Stocks" type="HBoxContainer" parent="Control/P1Panel/VBox/LivesRow"]
 theme_override_constants/separation = 6
-
-[node name="Stock1" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(0.3, 0.65, 1.0, 1)
-
-[node name="Stock2" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(0.3, 0.65, 1.0, 1)
-
-[node name="Stock3" type="ColorRect" parent="Control/P1Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(0.3, 0.65, 1.0, 1)
 
 [node name="P2Panel" type="PanelContainer" parent="Control"]
 anchor_left = 1.0
@@ -94,6 +94,7 @@ theme_override_constants/separation = 10
 alignment = 2
 
 [node name="LivesLabel" type="Label" parent="Control/P2Panel/VBox/LivesRow"]
+visible = false
 text = "Lives: 3"
 horizontal_alignment = 2
 theme_override_font_sizes/font_size = 16
@@ -102,14 +103,18 @@ theme_override_font_sizes/font_size = 16
 theme_override_constants/separation = 6
 alignment = 2
 
-[node name="Stock1" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(1.0, 0.35, 0.35, 1)
+[node name="TimerPanel" type="PanelContainer" parent="Control"]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -90.0
+offset_top = 16.0
+offset_right = 90.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_timer")
 
-[node name="Stock2" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(1.0, 0.35, 0.35, 1)
-
-[node name="Stock3" type="ColorRect" parent="Control/P2Panel/VBox/LivesRow/Stocks"]
-custom_minimum_size = Vector2(22, 22)
-color = Color(1.0, 0.35, 0.35, 1)
+[node name="TimerLabel" type="Label" parent="Control/TimerPanel"]
+text = "3:00"
+theme_override_font_sizes/font_size = 36
+horizontal_alignment = 1
+vertical_alignment = 1

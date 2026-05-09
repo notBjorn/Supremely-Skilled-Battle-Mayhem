@@ -1,0 +1,139 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://menus/settings_menu.gd" id="1"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.06, 0.06, 0.14, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="CenterContainer/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="ModeRow" type="HBoxContainer" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ModeLabel" type="Label" parent="CenterContainer/VBox/ModeRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Mode:"
+vertical_alignment = 1
+
+[node name="StockButton" type="Button" parent="CenterContainer/VBox/ModeRow"]
+custom_minimum_size = Vector2(130, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Stock"
+
+[node name="TimerButton" type="Button" parent="CenterContainer/VBox/ModeRow"]
+custom_minimum_size = Vector2(130, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Timer"
+
+[node name="StockOptions" type="HBoxContainer" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="StockLabel" type="Label" parent="CenterContainer/VBox/StockOptions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Lives:"
+vertical_alignment = 1
+
+[node name="StockMinus" type="Button" parent="CenterContainer/VBox/StockOptions"]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "−"
+
+[node name="StockCount" type="Label" parent="CenterContainer/VBox/StockOptions"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StockPlus" type="Button" parent="CenterContainer/VBox/StockOptions"]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="TimerOptions" type="HBoxContainer" parent="CenterContainer/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="TimerLabel" type="Label" parent="CenterContainer/VBox/TimerOptions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Time:"
+vertical_alignment = 1
+
+[node name="TimerMinus" type="Button" parent="CenterContainer/VBox/TimerOptions"]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "−"
+
+[node name="TimerCount" type="Label" parent="CenterContainer/VBox/TimerOptions"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "3 min"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimerPlus" type="Button" parent="CenterContainer/VBox/TimerOptions"]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Spacer2" type="Control" parent="CenterContainer/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBox"]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Back"
+
+[connection signal="pressed" from="CenterContainer/VBox/ModeRow/StockButton" to="." method="_on_stock_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/ModeRow/TimerButton" to="." method="_on_timer_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/StockOptions/StockMinus" to="." method="_on_stock_minus_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/StockOptions/StockPlus" to="." method="_on_stock_plus_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/TimerOptions/TimerMinus" to="." method="_on_timer_minus_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/TimerOptions/TimerPlus" to="." method="_on_timer_plus_pressed"]
+[connection signal="pressed" from="CenterContainer/VBox/BackButton" to="." method="_on_back_button_pressed"]

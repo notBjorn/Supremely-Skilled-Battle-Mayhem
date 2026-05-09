@@ -47,4 +47,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Play"
 
+[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1526103747]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
