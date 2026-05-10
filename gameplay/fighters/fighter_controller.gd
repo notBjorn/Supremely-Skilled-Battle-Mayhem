@@ -42,7 +42,7 @@ const STATE_COLORS := {
 @export var fall_speed_limit := 10.0
 @export var spawn_position := Vector3.ZERO
 @export var max_jumps := 2
-@export var double_jump_velocity_scale := 0.80
+@export var double_jump_velocity_scale := 1.1
 @export var drop_through_duration := 0.3
 @export var fast_fall_multiplier := 1.35
 @export var ground_layer_bit := 1
@@ -68,6 +68,7 @@ const STATE_COLORS := {
 @export var ledge_hang_invincibility := 1.5
 @export var ledge_regrab_cooldown := 0.50
 @export var ledge_release_jump_scale := 1.0
+@export var di_max_angle_degrees := 18.0
 
 @export var idle_animation := "Idle"
 @export var run_animation := "Run"
@@ -186,7 +187,7 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 	if state == STATE_LEDGE:		# Release Ledge on damage
 		_release_current_ledge()
 	damage_percent += amount
-	velocity = knockback / maxf(weight, 0.1)
+	velocity = _apply_di(knockback) / maxf(weight, 0.1)
 	if velocity.z != 0.0:
 		facing_z = signf(velocity.z)
 		_update_facing()
@@ -195,6 +196,48 @@ func take_damage(amount: float, knockback: Vector3) -> void:
 	_disable_hitbox()
 	_set_state(STATE_DAMAGE)
 	damaged.emit(_player_index(), damage_percent)
+
+#influence direction of knockback after getting hit
+func _apply_di(knockback: Vector3) ->Vector3:
+	#check user inpit
+	var input_z := Input.get_axis(move_right_action, move_left_action)
+	var input_y := 0.0
+	if Input.is_action_pressed(jump_action):
+		input_y += 1.0
+	if Input.is_action_pressed(down_action):
+		input_y -= 1.0
+	
+	var input_dir := Vector2(input_y, input_z)
+	if input_dir.length_squared() < 0.01:      #bascially if there is no input
+		#print("no DI")
+		return knockback
+		
+	# if we do have an input tho, then we normalize the vector
+	input_dir = input_dir.normalized() #all we care about is direction
+	
+	# project knockback values into a 2d space (y, z)
+	var knockback_2d := Vector2(knockback.y, knockback.z)
+	
+	#check if we have anyknockback
+	if knockback_2d.length_squared() < 0.01:
+		return knockback
+	
+	var knock_dir := knockback_2d.normalized()
+	var knock_prep := Vector2(-knock_dir.y, knock_dir.x) #not sure what goes on here but we are rotating the knock direction for some reason
+	
+	#how much is our input away from the prependicular
+	var dir_factor := input_dir.dot(knock_prep)
+	
+	#what angle will the DI be in realation to the max angle
+	var angle := deg_to_rad(di_max_angle_degrees) * dir_factor
+	var DIed_knock := knockback_2d.rotated(angle) # rotate the angle of knock by the angle we just got
+	
+	var finalKnockback := Vector3(knockback.x, DIed_knock.x, DIed_knock.y)
+	#print (knockback)
+	#print(finalKnockback)
+	
+	return finalKnockback
+
 
 func _input(event: InputEvent) -> void:
 	if state == STATE_LEDGE:
