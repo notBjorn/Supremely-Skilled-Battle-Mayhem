@@ -104,7 +104,7 @@ var is_fast_falling := false
 var current_ledge: Ledge = null
 var ledge_grab_cooldown_remaining := 0.0
 
-var mesh_instance: MeshInstance3D
+var mesh_instances: Array = []
 var state_material: StandardMaterial3D
 var model_root: Node3D
 var hitbox: Area3D
@@ -122,12 +122,13 @@ var current_animation := ""
 func _ready() -> void:
 	if spawn_position == Vector3.ZERO:
 		spawn_position = global_position
-	mesh_instance = get_node_or_null("Body") as MeshInstance3D
 	state_material = StandardMaterial3D.new()
 	state_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	if mesh_instance:
-		mesh_instance.material_override = state_material
 	model_root = get_node_or_null("Model") as Node3D
+	if model_root:
+		mesh_instances = model_root.find_children("*", "MeshInstance3D", true)
+		for mi in mesh_instances:
+			mi.material_override = state_material
 	_ensure_hitbox()
 	_ensure_pushbox()
 	_ensure_shield_visual()
@@ -570,7 +571,7 @@ func _set_state(next_state: String) -> void:
 	var prev_state := state
 	state = next_state
 	if state_material:
-		var color: Color = STATE_COLORS.get(state, Color.WHITE)
+		var color: Color = Color.CORNFLOWER_BLUE if player_label == "P1" else Color.INDIAN_RED
 		color.a = state_material.albedo_color.a
 		state_material.albedo_color = color
 	if sfx_shield:
